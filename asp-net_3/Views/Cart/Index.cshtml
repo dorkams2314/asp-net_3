@@ -1,0 +1,71 @@
+@model asp_net_3.ViewModels.CartViewModel
+
+@{
+    ViewData["Title"] = "Корзина";
+}
+
+<div class="page-block">
+    <h1 class="page-title">Корзина</h1>
+    <p class="page-text">Здесь можно изменить количество товаров, пересчитать сумму и удалить ненужные позиции.</p>
+</div>
+
+@if (!Model.Items.Any()) {
+    <div class="page-block">
+        <p>Корзина пока пустая.</p>
+        <a class="btn btn-primary" asp-controller="Store" asp-action="Index">Перейти в каталог</a>
+    </div>
+} else {
+    <div class="page-block">
+        <table class="simple-table">
+            <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th>Категория</th>
+                    <th>Цена</th>
+                    <th>Количество</th>
+                    <th>Сумма</th>
+                    <th>Удаление</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.Items) {
+                <tr>
+                    <td>
+                        <strong>@item.ProductName</strong><br />
+                        <span>@item.Description</span>
+                    </td>
+                    <td>@item.CategoryName</td>
+                    <td class="price-cell">@item.Price.ToString("N2") руб.</td>
+                    <td>
+                        <form asp-action="UpdateQuantity" method="post" class="qty-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="itemId" value="@item.Id" />
+                            <input class="form-control qty-input" type="number" name="quantity" value="@item.Quantity" min="1" />
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Обновить</button>
+                        </form>
+                    </td>
+                    <td class="total-cell">@item.TotalPrice.ToString("N2") руб.</td>
+                    <td>
+                        <form asp-action="Remove" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="itemId" value="@item.Id" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page-block summary-box">
+        <div class="summary-line">
+            <span>Количество позиций</span>
+            <span>@Model.Items.Count</span>
+        </div>
+        <div class="summary-line">
+            <span>Итоговая стоимость</span>
+            <span>@Model.TotalPrice.ToString("N2") руб.</span>
+        </div>
+    </div>
+}

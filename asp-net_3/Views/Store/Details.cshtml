@@ -1,0 +1,38 @@
+@model asp_net_3.Models.Product
+
+@{
+    ViewData["Title"] = "Карточка товара";
+}
+
+<div class="page-block">
+    <h1 class="page-title">Карточка товара</h1>
+    <table class="simple-table">
+        <tbody>
+            <tr>
+                <th>Название</th>
+                <td>@Model.Name</td>
+            </tr>
+            <tr>
+                <th>Категория</th>
+                <td>@Model.Category?.Name</td>
+            </tr>
+            <tr>
+                <th>Описание</th>
+                <td>@Model.Description</td>
+            </tr>
+            <tr>
+                <th>Цена</th>
+                <td>@Model.Price.ToString("N2") руб.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="simple-actions mt-3">
+        <a class="btn btn-outline-secondary" asp-controller="Store" asp-action="Index">Назад в каталог</a>
+        <form asp-controller="Cart" asp-action="Add" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="productId" value="@Model.Id" />
+            <button type="submit" class="btn btn-primary">Добавить в корзину</button>
+        </form>
+    </div>
+</div>
