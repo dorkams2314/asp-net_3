@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Админ-панель";
+}
+
+@await Html.PartialAsync("_AdminMenu")
+
+<div class="page-block">
+    <h1 class="page-title">Административная панель</h1>
+    <p class="page-text">Здесь можно управлять данными интернет-магазина: просматривать, добавлять, изменять и удалять записи из базы данных.</p>
+</div>
+
+<div class="admin-grid">
+    <a class="admin-card" asp-controller="AdminRoles" asp-action="Index">Роли</a>
+    <a class="admin-card" asp-controller="AdminUsers" asp-action="Index">Пользователи</a>
+    <a class="admin-card" asp-controller="AdminCategories" asp-action="Index">Категории</a>
+    <a class="admin-card" asp-controller="AdminProducts" asp-action="Index">Товары</a>
+    <a class="admin-card" asp-controller="AdminCarts" asp-action="Index">Корзины</a>
+    <a class="admin-card" asp-controller="AdminCartItems" asp-action="Index">Товары в корзине</a>
+    <a class="admin-card" asp-controller="AdminOrders" asp-action="Index">Заказы</a>
+    <a class="admin-card" asp-controller="AdminOrderItems" asp-action="Index">Состав заказа</a>
+</div>

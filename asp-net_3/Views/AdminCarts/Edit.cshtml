@@ -1,0 +1,23 @@
+@model asp_net_3.Models.Cart
+
+@{
+    ViewData["Title"] = "Изменить корзину";
+}
+
+@await Html.PartialAsync("_AdminMenu")
+
+<div class="page-block form-block">
+    <h1 class="page-title">Изменить корзину</h1>
+
+    <form asp-action="Edit" method="post">
+        <input asp-for="Id" type="hidden" />
+
+        <div class="mb-3">
+            <label class="form-label">Пользователь</label>
+            <select asp-for="UserId" asp-items="ViewBag.Users" class="form-select"></select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Назад</a>
+    </form>
+</div>

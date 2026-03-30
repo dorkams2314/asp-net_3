@@ -1,3 +1,4 @@
+using asp_net_3;
 using asp_net_3.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,26 @@ if (!app.Environment.IsDevelopment()) {
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+#if !DEBUG
+app.Use(async (context, next) => {
+    if (context.Request.Path.StartsWithSegments("/Admin") ||
+        context.Request.Path.StartsWithSegments("/AdminRoles") ||
+        context.Request.Path.StartsWithSegments("/AdminUsers") ||
+        context.Request.Path.StartsWithSegments("/AdminCategories") ||
+        context.Request.Path.StartsWithSegments("/AdminProducts") ||
+        context.Request.Path.StartsWithSegments("/AdminCarts") ||
+        context.Request.Path.StartsWithSegments("/AdminCartItems") ||
+        context.Request.Path.StartsWithSegments("/AdminOrders") ||
+        context.Request.Path.StartsWithSegments("/AdminOrderItems")) {
+        context.Response.StatusCode = 404;
+        return;
+    }
+
+    await next();
+});
+#endif
+
 app.UseRouting();
 
 app.UseAuthorization();
