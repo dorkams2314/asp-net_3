@@ -97,8 +97,14 @@ namespace asp_net_3.Controllers.Admin {
                 return NotFound();
 
             _context.OrderItems.Remove(orderItem);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
+
+            try {
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            } catch (DbUpdateException) {
+                TempData["DeleteError"] = "Не удалось удалить запись: есть связанные данные в базе.";
+                return RedirectToAction("Delete", new { id });
+            }
         }
 
         private void LoadData(int selectedOrderId = 0, int selectedProductId = 0) {

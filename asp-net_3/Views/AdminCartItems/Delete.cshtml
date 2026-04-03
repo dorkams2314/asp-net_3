@@ -10,6 +10,10 @@
     <h1 class="page-title">Удалить товар из корзины</h1>
     <p>Вы действительно хотите удалить эту запись?</p>
 
+    @if (TempData["DeleteError"] != null) {
+        <div class="alert alert-danger">@TempData["DeleteError"]</div>
+    }
+
     <table class="simple-table">
         <tbody>
             <tr>

@@ -51,7 +51,7 @@ namespace asp_net_3.Data {
                 .HasOne(cart => cart.User)
                 .WithMany(user => user.Carts)
                 .HasForeignKey(cart => cart.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CartItem>()
                 .HasOne(item => item.Cart)
