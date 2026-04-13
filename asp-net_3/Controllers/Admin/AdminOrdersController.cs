@@ -1,5 +1,6 @@
 using asp_net_3.Data;
 using asp_net_3.Models;
+using asp_net_3.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -7,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 namespace asp_net_3.Controllers.Admin {
     public class AdminOrdersController : Controller {
         private readonly ApplicationDbContext _context;
+        private readonly AdminDeleteService _adminDeleteService;
 
-        public AdminOrdersController(ApplicationDbContext context) {
+        public AdminOrdersController(ApplicationDbContext context, AdminDeleteService adminDeleteService) {
             _context = context;
+            _adminDeleteService = adminDeleteService;
         }
 
         public async Task<IActionResult> Index() {
@@ -78,19 +81,11 @@ namespace asp_net_3.Controllers.Admin {
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id) {
-            Order? order = await _context.Orders.FindAsync(id);
-            if (order == null)
+            bool deleted = await _adminDeleteService.DeleteOrderAsync(id);
+            if (!deleted)
                 return NotFound();
 
-            _context.Orders.Remove(order);
-
-            try {
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
-            } catch (DbUpdateException) {
-                TempData["DeleteError"] = "Не удалось удалить запись: есть связанные данные в базе.";
-                return RedirectToAction("Delete", new { id });
-            }
+            return RedirectToAction("Index");
         }
 
         private void LoadUsers(int selectedId = 0) {

@@ -1,5 +1,6 @@
 using asp_net_3.Data;
 using asp_net_3.Models;
+using asp_net_3.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -7,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 namespace asp_net_3.Controllers.Admin {
     public class AdminUsersController : Controller {
         private readonly ApplicationDbContext _context;
+        private readonly AdminDeleteService _adminDeleteService;
 
-        public AdminUsersController(ApplicationDbContext context) {
+        public AdminUsersController(ApplicationDbContext context, AdminDeleteService adminDeleteService) {
             _context = context;
+            _adminDeleteService = adminDeleteService;
         }
 
         public async Task<IActionResult> Index() {
@@ -93,34 +96,11 @@ namespace asp_net_3.Controllers.Admin {
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id) {
-            User? user = await _context.Users
-                .Include(x => x.Role)
-                .Include(x => x.Carts)
-                .Include(x => x.Orders)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (user == null)
+            bool deleted = await _adminDeleteService.DeleteUserAsync(id);
+            if (!deleted)
                 return NotFound();
 
-            if (user.Orders.Any()) {
-                ModelState.AddModelError("", "Нельзя удалить пользователя, у которого есть заказы.");
-                SetDeleteInfo(user);
-                return View("Delete", user);
-            }
-
-            if (user.Carts.Any())
-                _context.Carts.RemoveRange(user.Carts);
-
-            _context.Users.Remove(user);
-
-            try {
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
-            } catch (DbUpdateException) {
-                ModelState.AddModelError("", "Не удалось удалить пользователя из-за связанных записей в базе данных.");
-                SetDeleteInfo(user);
-                return View("Delete", user);
-            }
+            return RedirectToAction("Index");
         }
 
         private void LoadRoles(int selectedId = 0) {

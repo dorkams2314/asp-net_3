@@ -1,14 +1,17 @@
 using asp_net_3.Data;
 using asp_net_3.Models;
+using asp_net_3.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace asp_net_3.Controllers.Admin {
     public class AdminCategoriesController : Controller {
         private readonly ApplicationDbContext _context;
+        private readonly AdminDeleteService _adminDeleteService;
 
-        public AdminCategoriesController(ApplicationDbContext context) {
+        public AdminCategoriesController(ApplicationDbContext context, AdminDeleteService adminDeleteService) {
             _context = context;
+            _adminDeleteService = adminDeleteService;
         }
 
         public async Task<IActionResult> Index() {
@@ -69,19 +72,11 @@ namespace asp_net_3.Controllers.Admin {
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id) {
-            Category? category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            bool deleted = await _adminDeleteService.DeleteCategoryAsync(id);
+            if (!deleted)
                 return NotFound();
 
-            _context.Categories.Remove(category);
-
-            try {
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
-            } catch (DbUpdateException) {
-                TempData["DeleteError"] = "Не удалось удалить запись: есть связанные данные в базе.";
-                return RedirectToAction("Delete", new { id });
-            }
+            return RedirectToAction("Index");
         }
     }
 }
